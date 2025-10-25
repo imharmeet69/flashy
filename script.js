@@ -48,16 +48,39 @@ if (questionEl && cards.length > 0) {
 
 
 
-
-
-
-questionEl.textContent = question;
+// Safely set question text only when the element exists (avoids errors on input.html)
+if (questionEl) {
+  questionEl.textContent = question;
+}
 
 function updateProgress() {
+  // If there are no cards, avoid division by zero and show 0/0
+  if (!cards || cards.length === 0) {
+    if (loading) loading.style.width = '0%';
+    if (percentage) percentage.textContent = '0%';
+    if (total) total.textContent = `0/0`;
+    if (questionEl) questionEl.textContent = 'No cards available. Add some cards!';
+    // Disable navigation buttons except Add (delete button may be kept)
+    if (buttons && buttons.length) {
+      buttons.forEach(btn => btn.disabled = true);
+    }
+    // Also ensure delete is disabled if present
+    const del = document.querySelector('#delete');
+    if (del) del.disabled = true;
+    return;
+  }
+
+  // Ensure buttons are enabled when there are cards
+  if (buttons && buttons.length) {
+    buttons.forEach(btn => btn.disabled = false);
+  }
+  const del = document.querySelector('#delete');
+  if (del) del.disabled = false;
+
   const progressPercent = ((currentQuestion + 1) / cards.length) * 100;
-  loading.style.width = progressPercent + "%";
-  percentage.textContent = Math.round(progressPercent) + "%";
-  total.textContent = `${currentQuestion + 1}/${cards.length}`;
+  if (loading) loading.style.width = Math.max(0, Math.min(100, progressPercent)) + "%";
+  if (percentage) percentage.textContent = Math.round(Math.max(0, Math.min(100, progressPercent))) + "%";
+  if (total) total.textContent = `${currentQuestion + 1}/${cards.length}`;
 }
 
 updateProgress();
