@@ -5,6 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>flash card app</title>
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Redirect root/index page to input.html so input form opens first (works for GitHub Pages)
+    // BUT only redirect when there are no saved flashcards. If the user has created cards,
+    // we avoid redirecting so they can see their deck after submitting the form.
+    (function() {
+      try {
+        const path = location.pathname || '/';
+        const saved = localStorage.getItem('flashcards');
+        const hasCards = saved ? JSON.parse(saved).length > 0 : false;
+        // Redirect only when at root/index and there are NO cards
+        if ((path.endsWith('/') || path.endsWith('/index.html')) && !hasCards) {
+          if (!location.pathname.endsWith('input.html')) {
+            location.replace('input.html');
+          }
+        }
+      } catch (e) {
+        // If any error reading localStorage, fall back to redirecting to input
+        if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
+          if (!location.pathname.endsWith('input.html')) {
+            location.replace('input.html');
+          }
+        }
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="container">
